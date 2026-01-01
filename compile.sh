@@ -70,13 +70,13 @@ add_patches() {
   patch -p1 < rtl88xxau.patch
   wget -L https://gitlab.com/kalilinux/nethunter/build-scripts/kali-nethunter-kernel-builder/-/raw/main/patches/4.14/add-wifi-injection-4.14.patch -O wifi-injection.patch
   patch -p1 < wifi-injection.patch
-  sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
-  echo "CONFIG_POSIX_MQUEUE=y" >> arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
-  echo "CONFIG_SYSVIPC=y" >> arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
-  echo "CONFIG_CGROUP_DEVICE=y" >> arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
-  echo "CONFIG_DEVTMPFS=y" >> arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
-  echo "CONFIG_IPC_NS=y" >> arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
-  echo "CONFIG_DEVTMPFS_MOUNT=y" >> arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
+  sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' arch/arm64/configs/vendor/trinket-perf_defconfig
+  echo "CONFIG_POSIX_MQUEUE=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  echo "CONFIG_SYSVIPC=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  echo "CONFIG_CGROUP_DEVICE=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  echo "CONFIG_DEVTMPFS=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  echo "CONFIG_IPC_NS=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  echo "CONFIG_DEVTMPFS_MOUNT=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
 }
 
 add_dtbo() {
@@ -100,9 +100,9 @@ setup_ksu() {
   local arg="$1"
   if [[ "$arg" == "--ksu" ]]; then
     echo "Setting up KernelSU..."
-    echo "CONFIG_KSU=y" >> arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
-    echo "CONFIG_KSU_LSM_SECURITY_HOOKS=y" >> arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
-    echo "CONFIG_KSU_MANUAL_HOOKS=y" >> arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
+    echo "CONFIG_KSU=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+    echo "CONFIG_KSU_LSM_SECURITY_HOOKS=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+    echo "CONFIG_KSU_MANUAL_HOOKS=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
     wget -L "https://github.com/ximi-mojito-test/mojito_krenol/commit/8e25004fdc74d9bf6d902d02e402620c17c692df.patch" -O ksu.patch
     patch -p1 < ksu.patch
     patch -p1 < ksumakefile.patch
@@ -119,8 +119,9 @@ setup_ksu() {
 # Compile kernel
 compile_kernel() {
   echo -e "\nStarting compilation..."
-  sed -i 's/CONFIG_LOCALVERSION="-perf"/CONFIG_LOCALVERSION="-perf-neon"/' arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
-  make O=out ARCH=arm64 vendor/sdmsteppe-perf_defconfig
+  sed -i 's/CONFIG_LOCALVERSION="-perf"/CONFIG_LOCALVERSION="-perf-neon"/' arch/arm64/configs/vendor/trinket-perf_defconfig
+  make O=out ARCH=arm64 vendor/trinket-perf_defconfig
+  make O=out ARCH=arm64 vendor/xiaomi-trinket.config
   make O=out ARCH=arm64 vendor/ginkgo.config
   make -j$(nproc --all) \
     O=out \
