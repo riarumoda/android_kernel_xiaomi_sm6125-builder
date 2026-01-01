@@ -66,6 +66,8 @@ jobs:
         run: |
           cp android_kernel_xiaomi_sm6125/out/arch/arm64/boot/Image.gz AnyKernel3/
           sed -i 's/supported.versions=11-16/supported.versions=15/' AnyKernel3/anykernel.sh
+          sed -i 's/device.name1=sweet/device.name1=ginkgo/' AnyKernel3/anykernel.sh
+          sed -i 's/device.name2=sweetin/device.name2=ginkgo/' AnyKernel3/anykernel.sh
 
       - name: Zip AnyKernel3 contents
         run: |
