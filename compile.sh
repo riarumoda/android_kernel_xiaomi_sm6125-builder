@@ -31,7 +31,7 @@ setup_toolchain() {
 
   if [ ! -d "$PWD/clang" ]; then
     echo "Cloning Clang..."
-    git clone https://gitlab.com/nekoprjkt/aosp-clang --depth=1 clang
+    git clone https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b --depth=1 clang
   else
     echo "Local clang dir found, using it."
   fi
