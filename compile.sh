@@ -67,11 +67,11 @@ add_patches() {
   echo "CONFIG_DEVTMPFS_MOUNT=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
 }
 
-add_dtbo() {
-  echo "Adding dtbo compile support..."
-  wget -L "https://github.com/Skyblueborb/android_kernel_xiaomi_sm6125/commit/3ff2c3fc8a18a805029ab1de6f2cca9908bbc2ba.patch" -O dtbo.patch
-  patch -p1 < dtbo.patch
-}
+# add_dtbo() {
+#   echo "Adding dtbo compile support..."
+#   wget -L "https://github.com/Skyblueborb/android_kernel_xiaomi_sm6125/commit/3ff2c3fc8a18a805029ab1de6f2cca9908bbc2ba.patch" -O dtbo.patch
+#   patch -p1 < dtbo.patch
+# }
 
 # KSU Setup
 setup_ksu() {
@@ -128,7 +128,7 @@ main() {
   setup_toolchain
   update_path
   add_patches
-  add_dtbo
+  # add_dtbo
   setup_ksu "$1"
   compile_kernel
 }
