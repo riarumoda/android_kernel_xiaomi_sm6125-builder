@@ -59,6 +59,7 @@ add_patches() {
   wget -L https://gitlab.com/kalilinux/nethunter/build-scripts/kali-nethunter-kernel-builder/-/raw/main/patches/4.14/add-wifi-injection-4.14.patch -O wifi-injection.patch
   patch -p1 < wifi-injection.patch
   sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' arch/arm64/configs/vendor/trinket-perf_defconfig
+  sed -i 's/CONFIG_BUILD_ARM64_DT_OVERLAY=y/# CONFIG_BUILD_ARM64_DT_OVERLAY is not set/' arch/arm64/configs/vendor/trinket-perf_defconfig
   echo "CONFIG_POSIX_MQUEUE=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
   echo "CONFIG_SYSVIPC=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
   echo "CONFIG_CGROUP_DEVICE=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
