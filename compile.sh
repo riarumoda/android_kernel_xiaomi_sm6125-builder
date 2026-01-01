@@ -31,27 +31,15 @@ setup_toolchain() {
 
   if [ ! -d "$PWD/clang" ]; then
     echo "Cloning Clang..."
-    git clone https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r547379.git --depth=1 -b 15.0 clang
+    git clone https://gitlab.com/nekoprjkt/aosp-clang --depth=1 clang
   else
     echo "Local clang dir found, using it."
   fi
 
   if [ ! -d "$PWD/gcc32" ] && [ ! -d "$PWD/gcc64" ]; then
-    echo "Downloading GCC..."
-    ASSET_URLS=$(curl -s "https://api.github.com/repos/mvaisakh/gcc-build/releases/latest" | grep "browser_download_url" | cut -d '"' -f 4 | grep -E "eva-gcc-arm.*\.xz")
-    for url in $ASSET_URLS; do
-      wget -nv --content-disposition -L "$url"
-    done
-
-    for file in eva-gcc-arm*.xz; do
-      # The files are actually just plain tarballs named as .xz
-      if [[ "$file" == *arm64* ]]; then
-        tar -xf "$file" && mv gcc-arm64 gcc64
-      else
-        tar -xf "$file" && mv gcc-arm gcc32
-      fi
-      rm -rf "$file"
-    done
+    echo "Cloning GCC..."
+    git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git --depth=1 gcc64
+    git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9.git --depth=1 gcc32
   else
     echo "Local gcc dirs found, using them."
   fi
@@ -113,13 +101,19 @@ compile_kernel() {
   make O=out ARCH=arm64 vendor/trinket-perf_defconfig
   make O=out ARCH=arm64 vendor/xiaomi-trinket.config
   make O=out ARCH=arm64 vendor/ginkgo.config
-  make -j$(nproc --all) \
-    O=out \
+  make -j$(nproc --all) O=out \
     ARCH=arm64 \
-    LLVM=1 \
-    LLVM_IAS=1 \
-    CROSS_COMPILE=$GCC64_DIR/bin/aarch64-elf- \
-    CROSS_COMPILE_COMPAT=$GCC32_DIR/bin/arm-eabi-
+    CC=clang \
+    LD=ld.lld \
+    AR=llvm-ar \
+    AS=llvm-as \
+    NM=llvm-nm \
+    OBJCOPY=llvm-objcopy \
+    OBJDUMP=llvm-objdump \
+    STRIP=llvm-strip \
+    CROSS_COMPILE=aarch64-linux-android- \
+    CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+    CLANG_TRIPLE=aarch64-linux-gnu-
 }
 
 # Main function
