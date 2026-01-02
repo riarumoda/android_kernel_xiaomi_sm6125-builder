@@ -71,7 +71,6 @@ jobs:
       - name: Zip AnyKernel3 contents
         run: |
           ZIPNAME="aosp-perf-neon-${{ matrix.build-type }}-lineage22.2-${{ steps.ts.outputs.DATE }}-${{ steps.ts.outputs.TIME }}-ginkgo.zip"
-          SHENANIGANS="shenanigans-${{ matrix.build-type }}.zip"
           cd AnyKernel3
           zip -rq9 "../$ZIPNAME" ./*
           cd ..
