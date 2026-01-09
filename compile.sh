@@ -60,7 +60,7 @@ add_patches() {
   patch -p1 < wifi-injection.patch
   sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' arch/arm64/configs/vendor/trinket-perf_defconfig
   sed -i 's/CONFIG_BUILD_ARM64_DT_OVERLAY=y/# CONFIG_BUILD_ARM64_DT_OVERLAY is not set/' arch/arm64/configs/vendor/trinket-perf_defconfig
-  sed -i 's/CONFIG_HZ_300=y/CONFIG_HZ_1000=y/' arch/arm64/configs/vendor/sdmsteppe-perf_defconfig
+  sed -i 's/CONFIG_HZ_100=y/CONFIG_HZ_1000=y/' arch/arm64/configs/vendor/trinket-perf_defconfig
   echo "CONFIG_POSIX_MQUEUE=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
   echo "CONFIG_SYSVIPC=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
   echo "CONFIG_CGROUP_DEVICE=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
