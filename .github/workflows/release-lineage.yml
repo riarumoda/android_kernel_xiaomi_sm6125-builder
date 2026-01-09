@@ -37,7 +37,6 @@ jobs:
             git clone https://github.com/LineageOS/android_kernel_xiaomi_sm6125 --depth=1 -b lineage-23.0
           fi
           cp ksumakefile.patch android_kernel_xiaomi_sm6125/
-          cp umount.patch android_kernel_xiaomi_sm6125/
           cp compile.sh android_kernel_xiaomi_sm6125/
           chmod +x ./android_kernel_xiaomi_sm6125/compile.sh
 
