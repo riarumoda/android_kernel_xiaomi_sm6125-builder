@@ -1,9 +1,9 @@
-name: Weekly Kernel Build & Release (LineageOS 23 branch)
+name: Weekly builds
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '12 4 * * 0'
+    - cron: '5 5 * * 0'
 
 permissions:
   contents: write
@@ -16,7 +16,7 @@ jobs:
       date: ${{ steps.ts.outputs.DATE }}
     strategy:
       matrix:
-        build-type: [non-ksu, ksu]
+        build-type: [lineage-22.2, lineage-23.0]
 
     steps:
       - uses: actions/checkout@v6
@@ -29,25 +29,23 @@ jobs:
             libc6 curl libstdc++6 git wget libssl-dev zstd \
             lld python3
 
-      - name: Clone kernel repo & prepare for compile
+      - name: Prepare for compile (${{ matrix.build-type }})
         run: |
-          git clone https://github.com/LineageOS/android_kernel_xiaomi_sm6125 --depth=1 -b lineage-23.0
+          if [[ "${{ matrix.build-type }}" == "lineage-22.2" ]]; then
+            git clone https://github.com/LineageOS/android_kernel_xiaomi_sm6125 --depth=1 -b lineage-22.2
+          elif [[ "${{ matrix.build-type }}" == "lineage-23.0" ]]; then
+            git clone https://github.com/LineageOS/android_kernel_xiaomi_sm6125 --depth=1 -b lineage-23.0
+          fi
           cp ksumakefile.patch android_kernel_xiaomi_sm6125/
           cp umount.patch android_kernel_xiaomi_sm6125/
           cp compile.sh android_kernel_xiaomi_sm6125/
           chmod +x ./android_kernel_xiaomi_sm6125/compile.sh
 
-      - name: Compile kernel (${{ matrix.build-type }})
+      - name: Compile the kernel
         run: |
-          if [[ "${{ matrix.build-type }}" == "ksu" ]]; then
-            cd android_kernel_xiaomi_sm6125/
-            ./compile.sh --ksu
-            cd ..
-          else
-            cd android_kernel_xiaomi_sm6125/
-            ./compile.sh
-            cd ..
-          fi
+          cd android_kernel_xiaomi_sm6125/
+          ./compile.sh --ksu
+          cd ..
 
       - name: Timestamp
         id: ts
@@ -57,24 +55,28 @@ jobs:
           echo "DATE=$DATE" >> $GITHUB_OUTPUT
           echo "TIME=$TIME" >> $GITHUB_OUTPUT
 
-      - name: Clone AnyKernel3
-        run: git clone https://github.com/riarumoda/AnyKernel3 AnyKernel3
-
-      - name: Copy kernel artifacts
+      - name: Preparing AnyKernel3
         run: |
+          git clone https://github.com/riarumoda/AnyKernel3 AnyKernel3 --depth=1
           cp android_kernel_xiaomi_sm6125/out/arch/arm64/boot/Image.gz AnyKernel3/
-          sed -i 's/supported.versions=11-16/supported.versions=16/' AnyKernel3/anykernel.sh
+          cp android_kernel_xiaomi_sm6125/out/arch/arm64/boot/dtb.img AnyKernel3/
+          cp android_kernel_xiaomi_sm6125/out/arch/arm64/boot/dtbo.img AnyKernel3/
+          if [[ "${{ matrix.build-type }}" == "lineage-22.2" ]]; then
+            sed -i 's/supported.versions=11-16/supported.versions=15/' AnyKernel3/anykernel.sh
+          elif [[ "${{ matrix.build-type }}" == "lineage-23.0" ]]; then
+            sed -i 's/supported.versions=11-16/supported.versions=16/' AnyKernel3/anykernel.sh
+          fi
           sed -i 's/device.name1=sweet/device.name1=ginkgo/' AnyKernel3/anykernel.sh
           sed -i 's/device.name2=sweetin/device.name2=ginkgo/' AnyKernel3/anykernel.sh
           sed -i 's/ sm6150 AnyKernel3 template by Riaru Moda/ sm6125 AnyKernel3 template by Riaru Moda/' AnyKernel3/banner
 
-      - name: Zip AnyKernel3 contents
+      - name: Zip kernel contents
         run: |
-          ZIPNAME="aosp-perf-neon-${{ matrix.build-type }}-lineage23-${{ steps.ts.outputs.DATE }}-${{ steps.ts.outputs.TIME }}-ginkgo.zip"
+          ZIPNAME="aosp-perf-neon-${{ matrix.build-type }}-${{ steps.ts.outputs.DATE }}-${{ steps.ts.outputs.TIME }}-ginkgo.zip"
           cd AnyKernel3
           zip -rq9 "../$ZIPNAME" ./*
 
-      - name: Upload artifacts (kernel)
+      - name: Upload artifacts
         uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.build-type }}-zip
@@ -101,11 +103,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: kernel-los23-${{ needs.build.outputs.timestamp }}
-          name: Weekly build - ${{ needs.build.outputs.date }} (LOS23)
+          tag_name: kernel-lineage-${{ needs.build.outputs.timestamp }}
+          name: Weekly build - ${{ needs.build.outputs.date }}
           draft: false
           prerelease: false
+          body: |
+            Notes:
+              > Kernel has been built with -O3 optimization flag.     
+              > Kernel does not include any custom DTBO. ⚠️
+              > KernelSU latest manager can be found in [here](https://t.me/ksunext_ci) or in [here](https://github.com/KernelSU-Next/KernelSU-Next/actions/workflows/build-manager-ci.yml).   
           files: |
-            artifacts/non-ksu-zip/aosp-perf-neon-non-ksu-*.zip
-            artifacts/ksu-zip/aosp-perf-neon-ksu-*.zip
+            artifacts/lineage-22.2-zip/*.zip
+            artifacts/lineage-23.0-zip/*.zip
           overwrite_files: true

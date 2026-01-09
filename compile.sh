@@ -66,6 +66,12 @@ add_patches() {
   echo "CONFIG_DEVTMPFS=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
   echo "CONFIG_IPC_NS=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
   echo "CONFIG_DEVTMPFS_MOUNT=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  echo "CONFIG_FSCACHE=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  echo "CONFIG_FSCACHE_STATS=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  echo "CONFIG_FSCACHE_HISTOGRAM=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  echo "CONFIG_SECURITY_SELINUX_DEVELOP=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  sed -i 's/KBUILD_CFLAGS\s\++= -O2/KBUILD_CFLAGS   += -O3/g' Makefile
+  sed -i 's/LDFLAGS\s\++= -O2/LDFLAGS += -O3/g' Makefile
 }
 
 # KSU Setup
@@ -79,7 +85,6 @@ setup_ksu() {
     wget -L "https://github.com/ximi-mojito-test/mojito_krenol/commit/8e25004fdc74d9bf6d902d02e402620c17c692df.patch" -O ksu.patch
     patch -p1 < ksu.patch
     patch -p1 < ksumakefile.patch
-    patch -p1 < umount.patch
     git clone "$KSU_SETUP_URI" -b "$KSU_BRANCH" KernelSU
     cd drivers
     ln -sfv ../KernelSU/kernel kernelsu
@@ -93,6 +98,11 @@ setup_ksu() {
 compile_kernel() {
   echo -e "\nStarting compilation..."
   sed -i 's/CONFIG_LOCALVERSION="-perf"/CONFIG_LOCALVERSION="-perf-neon"/' arch/arm64/configs/vendor/trinket-perf_defconfig
+  git config user.email "riarucompile@riaru.com"
+  git config user.name "riaru-compile"
+  git config set advice.addEmbeddedRepo true
+  git add .
+  git commit -m "cleanup: applied patches before build"
   make O=out ARCH=arm64 vendor/trinket-perf_defconfig
   make O=out ARCH=arm64 vendor/xiaomi-trinket.config
   make O=out ARCH=arm64 vendor/ginkgo.config
