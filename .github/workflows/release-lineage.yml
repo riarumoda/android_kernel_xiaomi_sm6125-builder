@@ -43,7 +43,11 @@ jobs:
       - name: Compile the kernel
         run: |
           cd android_kernel_xiaomi_sm6125/
-          ./compile.sh --ksu
+          if [[ "${{ matrix.build-type }}" == "lineage-22.2" ]]; then
+            ./compile.sh --ksu --no-f2fs
+          elif [[ "${{ matrix.build-type }}" == "lineage-23.0" ]]; then
+            ./compile.sh --ksu --f2fs
+          fi
           cd ..
 
       - name: Timestamp
@@ -59,7 +63,7 @@ jobs:
           git clone https://github.com/riarumoda/AnyKernel3 AnyKernel3 --depth=1
           cp android_kernel_xiaomi_sm6125/out/arch/arm64/boot/Image.gz AnyKernel3/
           if [[ "${{ matrix.build-type }}" == "lineage-22.2" ]]; then
-            sed -i 's/supported.versions=11-16/supported.versions=15/' AnyKernel3/anykernel.sh
+            sed -i 's/supported.versions=11-16/supported.versions=11-15/' AnyKernel3/anykernel.sh
           elif [[ "${{ matrix.build-type }}" == "lineage-23.0" ]]; then
             sed -i 's/supported.versions=11-16/supported.versions=16/' AnyKernel3/anykernel.sh
           fi
@@ -108,6 +112,7 @@ jobs:
             Notes:
               > Kernel has been built with -O3 optimization flag.     
               > Kernel does not contain dtbo image. ⚠️
+              > F2FS Compression patch is not applied on lineage-22.2 builds. ⚠️
               > KernelSU latest manager can be found in [here](https://t.me/ksunext_ci) or in [here](https://github.com/KernelSU-Next/KernelSU-Next/actions/workflows/build-manager-ci.yml).   
           files: |
             artifacts/lineage-22.2-zip/*.zip

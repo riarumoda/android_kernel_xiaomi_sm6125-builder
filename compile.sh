@@ -10,6 +10,9 @@ help_message() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
   echo "  --ksu     Enable KernelSU support"
+  echo "  --no-ksu  Disable KernelSU support"
+  echo "  --f2fs    Enable f2fs compression support"
+  echo "  --no-f2fs Disable f2fs compression support"
   echo "  --help    Show this help message"
 }
 
@@ -75,6 +78,19 @@ add_patches() {
   sed -i 's/LDFLAGS\s\++= -O2/LDFLAGS += -O3/g' Makefile
 }
 
+add_f2fs() {
+  local arg="$1"
+  if [[ "$arg" == "--f2fs" ]]; then
+    echo "Adding f2fs compression patches..."
+    wget -L https://github.com/tbyool/android_kernel_xiaomi_sm6150/commit/02baeab5aaf5319e5d68f2319516efed262533ea.patch -O f2fscompression.patch
+    patch -p1 < f2fscompression.patch
+    echo "CONFIG_F2FS_FS_COMPRESSION=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+    echo "CONFIG_F2FS_FS_LZ4=y" >> arch/arm64/configs/vendor/trinket-perf_defconfig
+  elif [[ "$arg" == "--no-f2fs" ]]; then
+    echo "f2fs compression setup skipped."
+  fi
+}
+
 # KSU Setup
 setup_ksu() {
   local arg="$1"
@@ -90,7 +106,7 @@ setup_ksu() {
     cd drivers
     ln -sfv ../KernelSU/kernel kernelsu
     cd ..
-  else
+  elif [[ "$arg" == "--no-ksu" ]]; then
     echo "KernelSU setup skipped."
   fi
 }
@@ -134,9 +150,10 @@ main() {
   setup_toolchain
   update_path
   add_patches
+  add_f2fs "$2"
   setup_ksu "$1"
   compile_kernel
 }
 
 # Run the main function
-main "$1"
+main "$1" "$2"
