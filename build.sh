@@ -183,7 +183,6 @@ main() {
     setup_environment "$1" "$2" "$3" "$4"
     setup_toolchain
     add_patches
-    add_f2fs
     add_ksu
     compile_kernel
 }
