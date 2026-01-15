@@ -140,7 +140,10 @@ jobs:
             > KernelSU latest manager can be found in [here](https://github.com/backslashxx/KernelSU/releases).   
                
             > [!WARNING]  
-            > Use LineageOS 23 builds if you are on Android 16, for Android 15 and lower please use LineageOS 22 builds.   
+            > Use LineageOS 23 builds if you are on Android 16, for Android 15 and lower please use LineageOS 22 builds.  
+            
+            > [!CAUTION]
+            > This kernel does not contain separate dtbo image! Always backup your boot & dtbo image first before proceeding!
           files: |
             artifacts/lineage-22-noksu-zip/*.zip
             artifacts/lineage-23-noksu-zip/*.zip
