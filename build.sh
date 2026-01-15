@@ -76,7 +76,7 @@ add_patches() {
     echo "Applying patches..."
     # Apply general config patches
     sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' $MAIN_DEFCONFIG
-    sed -i 's/CONFIG_HZ_300=y/CONFIG_HZ_250=y/' $MAIN_DEFCONFIG
+    sed -i 's/CONFIG_HZ_100=y/CONFIG_HZ_250=y/' $MAIN_DEFCONFIG
     echo "CONFIG_POSIX_MQUEUE=y" >> $MAIN_DEFCONFIG
     echo "CONFIG_SYSVIPC=y" >> $MAIN_DEFCONFIG
     echo "CONFIG_CGROUP_DEVICE=y" >> $MAIN_DEFCONFIG
