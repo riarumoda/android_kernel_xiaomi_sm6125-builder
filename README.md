@@ -12,5 +12,6 @@ Compatible with official LineageOS builds for Redmi Note 8, but since this kerne
 
 # Credits
 [TBYOOL](https://github.com/tbyool) for the buildscripts and kernel patches.   
-[backslashxx](https://github.com/backslashxx) for ksu scope-minimized manual hooks.   
-[KernelSU-Next](https://github.com/KernelSU-Next) for KernelSU Next.   
+[backslashxx](https://github.com/backslashxx) for KernelSU & KernelSU scope-minimized manual hooks.   
+[TheSillyOk](https://github.com/TheSillyOk) for kpatch fixup patches.    
+
