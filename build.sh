@@ -69,8 +69,6 @@ setup_environment() {
     export SIMPLEGPU_PATCH3="https://github.com/ximi-mojito-test/mojito_krenol/commit/ebf97a47dc43b1285602c4d3cc9667377d021f1e.patch"
     # JackA1ltman SUSFS export
     export JACK_SUSFS_PATCH="https://github.com/JackA1ltman/NonGKI_Kernel_Build_2nd/raw/refs/heads/mainline/Patches/Patch/susfs_patch_to_4.14.patch"
-    # PD Charging Unlimiter export
-    export TBYOOL_PD_UNLIMIT_PATCH="https://github.com/tbyool/android_kernel_xiaomi_sm6150/commit/a287a622c6dc06ed651f58daba1a23960531dc7f.patch"
 }
 
 # Setup toolchain function
@@ -107,9 +105,6 @@ add_patches() {
     wget -qO- $DTBO_PATCH4 | patch -s -p1
     wget -qO- $DTBO_PATCH5 | patch -s -p1
     wget -qO- $DTBO_PATCH6 | patch -s -p1
-    # Apply PD Charging unlimiter
-    echo "Applying PD Charging unlimiter..."
-    wget -qO- $TBYOOL_PD_UNLIMIT_PATCH | patch -s -p1
     # Apply Simple GPU Algorithm patches
     echo "Applying Simple GPU Algorithm patches..."
     wget -qO- $SIMPLEGPU_PATCH1 | patch -s -p1
