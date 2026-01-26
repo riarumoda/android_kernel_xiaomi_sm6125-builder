@@ -37,12 +37,16 @@ setup_environment() {
         export KSU_SETUP_URI="https://github.com/backslashxx/KernelSU"
         export KSU_BRANCH="master"
         export KSU_GENERAL_PATCH="https://github.com/ximi-mojito-test/mojito_krenol/commit/ebc23ea38f787745590c96035cb83cd11eb6b0e7.patch"
+    elif [[ "$KERNELSU_SELECTOR" == "--ksu=KSU_VBAJ" ]]; then
+        export KSU_SETUP_URI="https://github.com/vbajs/KernelSU-Next"
+        export KSU_BRANCH="legacy"
+        export KSU_GENERAL_PATCH="https://github.com/ximi-mojito-test/mojito_krenol/commit/8e25004fdc74d9bf6d902d02e402620c17c692df.patch"
     elif [[ "$KERNELSU_SELECTOR" == "--ksu=NONE" ]]; then
         export KSU_SETUP_URI=""
         export KSU_BRANCH=""
         export KSU_GENERAL_PATCH=""
     else
-        echo "Invalid KernelSU selector. Use --ksu=KSU_BLXX, or --ksu=NONE."
+        echo "Invalid KernelSU selector. Use --ksu=KSU_BLXX, --ksu=KSU_VBAJ, or --ksu=NONE."
         exit 1
     fi
     # DTC Upgrade Exports
@@ -59,6 +63,14 @@ setup_environment() {
     export SILLY_KPATCH_NEXT_PATCH="https://github.com/TheSillyOk/kernel_ls_patches/raw/refs/heads/master/kpatch_fix.patch"
     # KernelSU umount patch
     export KSU_UMOUNT_PATCH="https://github.com/tbyool/android_kernel_xiaomi_sm6150/commit/64db0dfa2f8aa6c519dbf21eb65c9b89643cda3d.patch"
+    # Simple GPU Algorithm exports
+    export SIMPLEGPU_PATCH1="https://github.com/ximi-mojito-test/mojito_krenol/commit/466da67f1ee6a567c9bd60282123a07fc9ac75b5.patch"
+    export SIMPLEGPU_PATCH2="https://github.com/ximi-mojito-test/mojito_krenol/commit/f87bd5e18caba7dd0ba0b5c9147d59bb21ff606f.patch"
+    export SIMPLEGPU_PATCH3="https://github.com/ximi-mojito-test/mojito_krenol/commit/ebf97a47dc43b1285602c4d3cc9667377d021f1e.patch"
+    # JackA1ltman SUSFS export
+    export JACK_SUSFS_PATCH="https://github.com/JackA1ltman/NonGKI_Kernel_Build_2nd/raw/refs/heads/mainline/Patches/Patch/susfs_patch_to_4.14.patch"
+    # PD Charging Unlimiter export
+    export TBYOOL_PD_UNLIMIT_PATCH="https://github.com/tbyool/android_kernel_xiaomi_sm6150/commit/a287a622c6dc06ed651f58daba1a23960531dc7f.patch"
 }
 
 # Setup toolchain function
@@ -95,6 +107,15 @@ add_patches() {
     wget -qO- $DTBO_PATCH4 | patch -s -p1
     wget -qO- $DTBO_PATCH5 | patch -s -p1
     wget -qO- $DTBO_PATCH6 | patch -s -p1
+    # Apply PD Charging unlimiter
+    echo "Applying PD Charging unlimiter..."
+    wget -qO- $TBYOOL_PD_UNLIMIT_PATCH | patch -s -p1
+    # Apply Simple GPU Algorithm patches
+    echo "Applying Simple GPU Algorithm patches..."
+    wget -qO- $SIMPLEGPU_PATCH1 | patch -s -p1
+    wget -qO- $SIMPLEGPU_PATCH2 | patch -s -p1
+    wget -qO- $SIMPLEGPU_PATCH3 | patch -s -p1
+    echo "CONFIG_SIMPLE_GPU_ALGORITHM=y" >> $MAIN_DEFCONFIG
     # Apply general config patches
     echo "Tuning the rest of default configs..."
     sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' $MAIN_DEFCONFIG
@@ -129,8 +150,9 @@ add_ksu() {
         wget -qO- $SILLY_KPATCH_NEXT_PATCH | patch -s -p1
         if [[ "$KSU_SETUP_URI" == *"backslashxx/KernelSU"* ]]; then
             # Apply manual hook
-            wget -qO- $KSU_GENERAL_PATCH | patch -s -p1
-            # Clone xx's repository
+            # disable for now, we're gonna use hookless mode
+            # wget -qO- $KSU_GENERAL_PATCH | patch -s -p1
+            # Clone repository
             git clone $KSU_SETUP_URI --branch $KSU_BRANCH KernelSU &> /dev/null
             # Manual symlink creation
             cd drivers
@@ -141,6 +163,37 @@ add_ksu() {
             sed -i '/endmenu/i source "drivers/kernelsu/Kconfig"\n' drivers/Kconfig
             # Manual Config Enablement
             echo "CONFIG_KSU=y" >> $MAIN_DEFCONFIG
+            echo "CONFIG_KSU_TAMPER_SYSCALL_TABLE=y" >> $MAIN_DEFCONFIG
+        elif [[ "$KSU_SETUP_URI" == *"vbajs/KernelSU-Next"* ]]; then
+            # Apply manual hook
+            wget -qO- $KSU_GENERAL_PATCH | patch -s -p1
+            # Clone repository
+            git clone $KSU_SETUP_URI --branch $KSU_BRANCH KernelSU &> /dev/null
+            # Manual symlink creation
+            cd drivers
+            ln -sfv ../KernelSU/kernel kernelsu
+            cd ..
+            # Manual Makefile and Kconfig Editing
+            sed -i '$a \\nobj-$(CONFIG_KSU) += kernelsu/' drivers/Makefile
+            sed -i '/endmenu/i source "drivers/kernelsu/Kconfig"\n' drivers/Kconfig
+            # Manual Config Enablement
+            echo "CONFIG_KSU=y" >> $MAIN_DEFCONFIG
+            echo "KSU_MANUAL_HOOK=y" >> $MAIN_DEFCONFIG
+            # Apply susfs patches
+            wget -qO- $JACK_SUSFS_PATCH | patch -s -p1
+            # Enable susfs configs
+            echo "CONFIG_KSU_SUSFS=y" >> $MAIN_DEFCONFIG
+            echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> $MAIN_DEFCONFIG
+            echo "CONFIG_KSU_SUSFS_SUS_MOUNT=n" >> $MAIN_DEFCONFIG
+            echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> $MAIN_DEFCONFIG
+            echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> $MAIN_DEFCONFIG
+            echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> $MAIN_DEFCONFIG
+            echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> $MAIN_DEFCONFIG
+            echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=n" >> $MAIN_DEFCONFIG
+            echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> $MAIN_DEFCONFIG
+            echo "CONFIG_KSU_SUSFS_SUS_MAP=y" >> $MAIN_DEFCONFIG
+            # Disable custom susfs configs
+            echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=n" >> $MAIN_DEFCONFIG
         fi
     else
         echo "No KernelSU to set up."
