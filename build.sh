@@ -45,6 +45,15 @@ setup_environment() {
         echo "Invalid KernelSU selector. Use --ksu=KSU_BLXX, or --ksu=NONE."
         exit 1
     fi
+    # DTBO Exports
+    export DTBO_PATCH1="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/7e2b181c37276fc95edd491ad68562794b018cac.patch"
+    export DTBO_PATCH2="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/025a602667aa9539f1a06ae3bc78cbcd1df45455.patch"
+    export DTBO_PATCH3="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/a86a1df4f5547b96df80fca6fd098b8987c9854d.patch"
+    export DTBO_PATCH4="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/2504ed0b0cc27dcd8edd8f0f0113222de3f184ce.patch"
+    export DTBO_PATCH5="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/74a63b4b4610e83b9708b3620ecbf24a1804ba0e.patch"
+    export DTBO_PATCH6="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/da4f6e33dbfdde20e8c18823201ff84452f03cc7.patch"
+    export DTBO_PATCH7="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/c13245bffb69abc7ad6f3c7d4fa8c01ae7f83b35.patch"
+    export DTBO_PATCH8="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/c1e3cf8edd367f4322d52e720243315f5f82c649.patch"
     # TheSillyOk's Exports
     export SILLY_KPATCH_NEXT_PATCH="https://github.com/TheSillyOk/kernel_ls_patches/raw/refs/heads/master/kpatch_fix.patch"
     # KernelSU umount patch
@@ -73,8 +82,18 @@ setup_toolchain() {
 
 # Add patches function
 add_patches() {
-    echo "Applying patches..."
+    # Apply DTBO patches
+    echo "Applying DTBO patches..."
+    wget -qO- $DTBO_PATCH1 | patch -s -p1
+    wget -qO- $DTBO_PATCH2 | patch -s -p1
+    wget -qO- $DTBO_PATCH3 | patch -s -p1
+    wget -qO- $DTBO_PATCH4 | patch -s -p1
+    wget -qO- $DTBO_PATCH5 | patch -s -p1
+    wget -qO- $DTBO_PATCH6 | patch -s -p1
+    wget -qO- $DTBO_PATCH7 | patch -s -p1
+    wget -qO- $DTBO_PATCH8 | patch -s -p1
     # Apply general config patches
+    echo "Tuning the rest of default configs..."
     sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' $MAIN_DEFCONFIG
     sed -i 's/CONFIG_HZ_100=y/CONFIG_HZ_250=y/' $MAIN_DEFCONFIG
     echo "CONFIG_POSIX_MQUEUE=y" >> $MAIN_DEFCONFIG
@@ -93,8 +112,6 @@ add_patches() {
     echo "CONFIG_EXT4_FS_ENCRYPTION=y" >> $MAIN_DEFCONFIG
     # Apply kernel rename to defconfig
     sed -i 's/CONFIG_LOCALVERSION="-perf"/CONFIG_LOCALVERSION="-perf-neon"/' $MAIN_DEFCONFIG
-    # Workaround for sm6125 quirks
-    sed -i 's/CONFIG_BUILD_ARM64_DT_OVERLAY=y/# CONFIG_BUILD_ARM64_DT_OVERLAY is not set/' $MAIN_DEFCONFIG
     # Apply O3 flags into Kernel Makefile
     sed -i 's/KBUILD_CFLAGS\s\++= -O2/KBUILD_CFLAGS   += -O3/g' Makefile
     sed -i 's/LDFLAGS\s\++= -O2/LDFLAGS += -O3/g' Makefile
