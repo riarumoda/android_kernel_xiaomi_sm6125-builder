@@ -14,8 +14,9 @@ This kernel follows weekly builds of [devices/ginkgo/builds](https://download.li
 Compatible with official LineageOS builds for Redmi Note 8, but since this kernel strictly follows [LineageOS/android_kernel_xiaomi_sm6125](https://github.com/LineageOS/android_kernel_xiaomi_sm6125), the compatibility may vary between each releases. Always make sure you have a kernel backup before proceeding. This kernel might gonna work on non-lineage based roms but it is not guaranteed.
 
 # Credits
-[TBYOOL](https://github.com/tbyool) for the buildscripts, kernel patches, and KernelSU-NEXT forks.   
+[TBYOOL](https://github.com/tbyool) for the buildscripts & kernel patches.   
 [xiaomi-sm6150](https://github.com/xiaomi-sm6150) for the dtc & dtbo patches.     
 [backslashxx](https://github.com/backslashxx) for KernelSU & KernelSU scope-minimized manual hooks.   
+[KernelSU-Next](https:/github.com/KernelSU-Next) for KernelSU-Next.   
 [TheSillyOk](https://github.com/TheSillyOk) for kpatch fixup patches.    
 [JackA1ltman](https://github.com/JackA1ltman) for SUSFS patches.
