@@ -102,7 +102,7 @@ add_patches() {
     wget -qO- $DTBO_PATCH6 | patch -s -p1
     wget -qO- $DTBO_PATCH7 | patch -s -p1
     wget -qO- $DTBO_PATCH8 | patch -s -p1
-    wget -qO- $DTBO_PATCH9 | patch -s -p1
+    wget -qO- $DTBO_PATCH9 | patch -p1
     # Apply general config patches
     echo "Tuning the rest of default configs..."
     sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' $MAIN_DEFCONFIG
