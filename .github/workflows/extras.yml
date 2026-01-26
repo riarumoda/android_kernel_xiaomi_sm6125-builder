@@ -55,9 +55,9 @@ jobs:
           cd android_kernel_xiaomi_sm6125/
           echo "Starting to compile..."
           if [[ "${{ matrix.build-type }}" == "legacy" ]]; then
-            ./build.sh trinket-perf_defconfig xiaomi-trinket.config ginkgo.config --ksu=KSU_VBAJ
+            ./build.sh trinket-perf_defconfig xiaomi-trinket.config ginkgo.config --ksu=KSU_NEXT
           elif [[ "${{ matrix.build-type }}" == "current" ]]; then
-            ./build.sh trinket-perf_defconfig xiaomi-trinket.config ginkgo.config --ksu=KSU_VBAJ
+            ./build.sh trinket-perf_defconfig xiaomi-trinket.config ginkgo.config --ksu=KSU_NEXT
           fi
           cd ..
 
