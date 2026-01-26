@@ -37,8 +37,8 @@ setup_environment() {
         export KSU_SETUP_URI="https://github.com/backslashxx/KernelSU"
         export KSU_BRANCH="master"
         export KSU_GENERAL_PATCH="https://github.com/ximi-mojito-test/mojito_krenol/commit/ebc23ea38f787745590c96035cb83cd11eb6b0e7.patch"
-    elif [[ "$KERNELSU_SELECTOR" == "--ksu=KSU_VBAJ" ]]; then
-        export KSU_SETUP_URI="https://github.com/vbajs/KernelSU-Next"
+    elif [[ "$KERNELSU_SELECTOR" == "--ksu=KSU_NEXT" ]]; then
+        export KSU_SETUP_URI="https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh"
         export KSU_BRANCH="legacy"
         export KSU_GENERAL_PATCH="https://github.com/ximi-mojito-test/mojito_krenol/commit/8e25004fdc74d9bf6d902d02e402620c17c692df.patch"
     elif [[ "$KERNELSU_SELECTOR" == "--ksu=NONE" ]]; then
@@ -46,7 +46,7 @@ setup_environment() {
         export KSU_BRANCH=""
         export KSU_GENERAL_PATCH=""
     else
-        echo "Invalid KernelSU selector. Use --ksu=KSU_BLXX, --ksu=KSU_VBAJ, or --ksu=NONE."
+        echo "Invalid KernelSU selector. Use --ksu=KSU_BLXX, --ksu=KSU_NEXT, or --ksu=NONE."
         exit 1
     fi
     # DTC Upgrade Exports
@@ -159,23 +159,27 @@ add_ksu() {
             # Manual Config Enablement
             echo "CONFIG_KSU=y" >> $MAIN_DEFCONFIG
             echo "CONFIG_KSU_TAMPER_SYSCALL_TABLE=y" >> $MAIN_DEFCONFIG
-        elif [[ "$KSU_SETUP_URI" == *"vbajs/KernelSU-Next"* ]]; then
+        elif [[ "$KSU_SETUP_URI" == *"KernelSU-Next/KernelSU-Next"* ]]; then
             # Apply manual hook
             wget -qO- $KSU_GENERAL_PATCH | patch -s -p1
-            # Clone repository
-            git clone $KSU_SETUP_URI --branch $KSU_BRANCH KernelSU &> /dev/null
-            # Manual symlink creation
-            cd drivers
-            ln -sfv ../KernelSU/kernel kernelsu
-            cd ..
-            # Manual Makefile and Kconfig Editing
-            sed -i '$a \\nobj-$(CONFIG_KSU) += kernelsu/' drivers/Makefile
-            sed -i '/endmenu/i source "drivers/kernelsu/Kconfig"\n' drivers/Kconfig
+            # Run Setup Script
+            curl -LSs $KSU_SETUP_URI | bash -s $KSU_BRANCH
             # Manual Config Enablement
             echo "CONFIG_KSU=y" >> $MAIN_DEFCONFIG
             echo "KSU_MANUAL_HOOK=y" >> $MAIN_DEFCONFIG
             # Apply susfs patches
+            echo "Applying SUSFS patches..."
             wget -qO- $JACK_SUSFS_PATCH | patch -s -p1
+            # Apply ksu susfs patches
+            cd KernelSU-Next
+            git revert -n 8002f62
+            wget -qO- $VB_KSU_SUSFS_PATCH | patch -s -p1
+            git config user.email $GIT_EMAIL
+            git config user.name $GIT_NAME
+            git config set advice.addEmbeddedRepo true
+            git add .
+            git commit -m "cleanup: applied patches before build" &> /dev/null
+            cd ..
             # Enable susfs configs
             echo "CONFIG_KSU_SUSFS=y" >> $MAIN_DEFCONFIG
             echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> $MAIN_DEFCONFIG
@@ -194,6 +198,7 @@ add_ksu() {
         echo "No KernelSU to set up."
     fi
 }
+
 
 # Compile kernel function
 compile_kernel() {
