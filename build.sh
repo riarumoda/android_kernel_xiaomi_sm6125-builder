@@ -69,6 +69,8 @@ setup_environment() {
     export SIMPLEGPU_PATCH3="https://github.com/ximi-mojito-test/mojito_krenol/commit/ebf97a47dc43b1285602c4d3cc9667377d021f1e.patch"
     # JackA1ltman SUSFS export
     export JACK_SUSFS_PATCH="https://github.com/JackA1ltman/NonGKI_Kernel_Build_2nd/raw/refs/heads/mainline/Patches/Patch/susfs_patch_to_4.14.patch"
+    # vbajs KSu SUSFS Export
+    export VB_KSU_SUSFS_PATCH="https://github.com/vbajs/KernelSU-Next/commit/d2befa1c56c53e11e3f22cbce06f506a7394140f.patch"
 }
 
 # Setup toolchain function
