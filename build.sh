@@ -93,6 +93,7 @@ add_patches() {
     wget -qO- $DTBO_PATCH7 | patch -s -p1
     wget -qO- $DTBO_PATCH8 | patch -s -p1
     sed -i 's/(THERMAL_MAX_LIMIT-[0-9])/THERMAL_MAX_LIMIT/g' arch/arm64/boot/dts/qcom/trinket-thermal-overlay.dtsi
+    sed -i 's/THERMAL_MAX_LIMIT/0xFFFFFFFF/g' arch/arm64/boot/dts/qcom/trinket-thermal-overlay.dtsi
     # Apply general config patches
     echo "Tuning the rest of default configs..."
     sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' $MAIN_DEFCONFIG
