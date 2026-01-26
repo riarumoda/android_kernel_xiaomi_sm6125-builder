@@ -69,8 +69,6 @@ setup_environment() {
     export SIMPLEGPU_PATCH3="https://github.com/ximi-mojito-test/mojito_krenol/commit/ebf97a47dc43b1285602c4d3cc9667377d021f1e.patch"
     # JackA1ltman SUSFS export
     export JACK_SUSFS_PATCH="https://github.com/JackA1ltman/NonGKI_Kernel_Build_2nd/raw/refs/heads/mainline/Patches/Patch/susfs_patch_to_4.14.patch"
-    # BORE Scheduler Export
-    export XX_BORE_PATCH="https://github.com/ximi-mojito-test/mojito_krenol/commit/f339eb9dfef549af6a0ba2764ffceeb4818acadc.patch"
 }
 
 # Setup toolchain function
@@ -113,10 +111,6 @@ add_patches() {
     wget -qO- $SIMPLEGPU_PATCH2 | patch -s -p1
     wget -qO- $SIMPLEGPU_PATCH3 | patch -s -p1
     echo "CONFIG_SIMPLE_GPU_ALGORITHM=y" >> $MAIN_DEFCONFIG
-    # Apply BORE Scheduler patches
-    echo "Applying BORE Scheduler patches..."
-    wget -qO- $XX_BORE_PATCH | patch -s -p1
-    echo "CONFIG_SCHED_BORE=y" >> $MAIN_DEFCONFIG
     # Apply general config patches
     echo "Tuning the rest of default configs..."
     sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' $MAIN_DEFCONFIG
