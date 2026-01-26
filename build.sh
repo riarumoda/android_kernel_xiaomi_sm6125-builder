@@ -45,15 +45,6 @@ setup_environment() {
         echo "Invalid KernelSU selector. Use --ksu=KSU_BLXX, or --ksu=NONE."
         exit 1
     fi
-    # DTBO Settings
-    if [[ "$DEVICE_DEFCONFIG_IMPORT" == *"ginkgo"* ]]; then
-        OUT_DTBO="out/arch/arm64/boot/dtbo.img"
-        DTBO_TMP="out/dtbotmp"
-        IN_DTBO="out/arch/arm64/boot/dts/xiaomi/ginkgo-trinket-overlay.dtbo"
-    else
-        echo "Invalid Device for DTBO."
-        exit 1
-    fi
     # DTBO Exports
     export DTBO_PATCH1="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/7e2b181c37276fc95edd491ad68562794b018cac.patch"
     export DTBO_PATCH2="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/025a602667aa9539f1a06ae3bc78cbcd1df45455.patch"
@@ -63,7 +54,6 @@ setup_environment() {
     export DTBO_PATCH6="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/da4f6e33dbfdde20e8c18823201ff84452f03cc7.patch"
     export DTBO_PATCH7="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/c13245bffb69abc7ad6f3c7d4fa8c01ae7f83b35.patch"
     export DTBO_PATCH8="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/c1e3cf8edd367f4322d52e720243315f5f82c649.patch"
-    export DTBO_PATCH9="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/af371fa6a2b39d11e625a69f65b9a30a311648f9.patch"
     # TheSillyOk's Exports
     export SILLY_KPATCH_NEXT_PATCH="https://github.com/TheSillyOk/kernel_ls_patches/raw/refs/heads/master/kpatch_fix.patch"
     # KernelSU umount patch
@@ -102,7 +92,7 @@ add_patches() {
     wget -qO- $DTBO_PATCH6 | patch -s -p1
     wget -qO- $DTBO_PATCH7 | patch -s -p1
     wget -qO- $DTBO_PATCH8 | patch -s -p1
-    wget -qO- $DTBO_PATCH9 | patch -p1
+    sed -i 's/\xc2\xa0/ /g' arch/arm64/boot/dts/xiaomi/qcom-base/trinket-thermal-overlay.dtsi
     # Apply general config patches
     echo "Tuning the rest of default configs..."
     sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' $MAIN_DEFCONFIG
@@ -181,10 +171,6 @@ compile_kernel() {
         CROSS_COMPILE=aarch64-linux-android- \
         CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
         CLANG_TRIPLE=aarch64-linux-gnu-
-    
-    # Start DTBO creation
-    mkdir -p "$DTBO_TMP"
-    python3 "$KDIR/scripts/dtc/libfdt/mkdtboimg.py" create "$OUT_DTBO" --custom0=0x00000000 --custom1=0x00000000 --page_size=4096 "$IN_DTBO"
 }
 
 # Main function
