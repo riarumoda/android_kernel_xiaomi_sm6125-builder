@@ -13,7 +13,7 @@ setup_environment() {
     local DEVICE_DEFCONFIG_IMPORT="$3"
     local KERNELSU_SELECTOR="$4"
     # Maintainer info
-    export KBUILD_BUILD_USER=riaru
+    export KBUILD_BUILD_USER=riaru-hiyorun
     export KBUILD_BUILD_HOST=ximiedits
     export GIT_NAME="riaru-compile"
     export GIT_EMAIL="riaru-compile@riaru.com"
