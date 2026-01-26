@@ -15,8 +15,8 @@ Compatible with official LineageOS builds for Redmi Note 8, but since this kerne
 
 # Credits
 [TBYOOL](https://github.com/tbyool) for the buildscripts & kernel patches.   
-[xiaomi-sm6150](https://github.com/xiaomi-sm6150) for the dtc & dtbo patches.     
+[xiaomi-sm6150](https://github.com/xiaomi-sm6150) for the dtc & dtbo patches.   
 [backslashxx](https://github.com/backslashxx) for KernelSU & KernelSU scope-minimized manual hooks.   
 [KernelSU-Next](https:/github.com/KernelSU-Next) for KernelSU-Next.   
-[TheSillyOk](https://github.com/TheSillyOk) for kpatch fixup patches.    
-[JackA1ltman](https://github.com/JackA1ltman) for SUSFS patches.
+[TheSillyOk](https://github.com/TheSillyOk) for kpatch fixup patches.   
+[JackA1ltman](https://github.com/JackA1ltman) for SUSFS patches.   
