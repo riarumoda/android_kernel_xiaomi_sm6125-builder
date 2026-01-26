@@ -45,17 +45,16 @@ setup_environment() {
         echo "Invalid KernelSU selector. Use --ksu=KSU_BLXX, or --ksu=NONE."
         exit 1
     fi
+    # DTC Upgrade Exports
+    export DTC_PATCH1="https://github.com/LineageOS/android_kernel_xiaomi_sm6150/commit/e207247aa4553fff7190dde5dabb50aec400b513.patch"
+    export DTC_PATCH2="https://github.com/LineageOS/android_kernel_xiaomi_sm6150/commit/ae58bbd8f7af4c3c290e63ddcd4112559c5fc240.patch"
     # DTBO Exports
-    export DTBO_PATCH1="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/7e2b181c37276fc95edd491ad68562794b018cac.patch"
-    export DTBO_PATCH2="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/025a602667aa9539f1a06ae3bc78cbcd1df45455.patch"
-    export DTBO_PATCH3="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/a86a1df4f5547b96df80fca6fd098b8987c9854d.patch"
-    export DTBO_PATCH4="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/2504ed0b0cc27dcd8edd8f0f0113222de3f184ce.patch"
-    export DTBO_PATCH5="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/74a63b4b4610e83b9708b3620ecbf24a1804ba0e.patch"
-    export DTBO_PATCH6="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/da4f6e33dbfdde20e8c18823201ff84452f03cc7.patch"
-    export DTBO_PATCH7="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/c13245bffb69abc7ad6f3c7d4fa8c01ae7f83b35.patch"
-    export DTBO_PATCH8="https://github.com/FlopKernel-Series/flop_trinket-mi_kernel/commit/c1e3cf8edd367f4322d52e720243315f5f82c649.patch"
-    export DTBO_PATCH9="https://github.com/LineageOS/android_kernel_xiaomi_sm6150/commit/e207247aa4553fff7190dde5dabb50aec400b513.patch"
-    export DTBO_PATCH10="https://github.com/LineageOS/android_kernel_xiaomi_sm6150/commit/ae58bbd8f7af4c3c290e63ddcd4112559c5fc240.patch"
+    export DTBO_PATCH1="https://github.com/xiaomi-sm6150/android_kernel_xiaomi_sm6150/commit/e517bc363a19951ead919025a560f843c2c03ad3.patch"
+    export DTBO_PATCH2="https://github.com/xiaomi-sm6150/android_kernel_xiaomi_sm6150/commit/a62a3b05d0f29aab9c4bf8d15fe786a8c8a32c98.patch"
+    export DTBO_PATCH3="https://github.com/xiaomi-sm6150/android_kernel_xiaomi_sm6150/commit/4b89948ec7d610f997dd1dab813897f11f403a06.patch"
+    export DTBO_PATCH4="https://github.com/xiaomi-sm6150/android_kernel_xiaomi_sm6150/commit/fade7df36b01f2b170c78c63eb8fe0d11c613c4a.patch"
+    export DTBO_PATCH5="https://github.com/xiaomi-sm6150/android_kernel_xiaomi_sm6150/commit/2628183db0d96be8dae38a21f2b09cb10978f423.patch"
+    export DTBO_PATCH6="https://github.com/xiaomi-sm6150/android_kernel_xiaomi_sm6150/commit/31f4577af3f8255ae503a5b30d8f68906edde85f.patch"
     # TheSillyOk's Exports
     export SILLY_KPATCH_NEXT_PATCH="https://github.com/TheSillyOk/kernel_ls_patches/raw/refs/heads/master/kpatch_fix.patch"
     # KernelSU umount patch
@@ -84,6 +83,10 @@ setup_toolchain() {
 
 # Add patches function
 add_patches() {
+    # Apply DTC Upgrades from sm6150
+    echo "Upgrading dtc to v1.4.6..."
+    wget -qO- $DTC_PATCH1 | patch -s -p1
+    wget -qO- $DTC_PATCH2 | patch -s -p1
     # Apply DTBO patches
     echo "Applying DTBO patches..."
     wget -qO- $DTBO_PATCH1 | patch -s -p1
@@ -92,13 +95,6 @@ add_patches() {
     wget -qO- $DTBO_PATCH4 | patch -s -p1
     wget -qO- $DTBO_PATCH5 | patch -s -p1
     wget -qO- $DTBO_PATCH6 | patch -s -p1
-    wget -qO- $DTBO_PATCH7 | patch -s -p1
-    wget -qO- $DTBO_PATCH8 | patch -s -p1
-    # Apply additional patch from sm6150
-    echo "-----------------Updating dtc to v1.4.5..."
-    wget -qO- $DTBO_PATCH9 | patch -p1
-    echo "-----------------Updating dtc to v1.4.6..."
-    wget -qO- $DTBO_PATCH10 | patch -p1
     # Apply general config patches
     echo "Tuning the rest of default configs..."
     sed -i 's/# CONFIG_PID_NS is not set/CONFIG_PID_NS=y/' $MAIN_DEFCONFIG
